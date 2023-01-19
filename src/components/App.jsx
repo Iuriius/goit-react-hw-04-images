@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import fetch from '../components/Api';
 import Searchbar from '../components/Searchbar';
@@ -17,44 +17,44 @@ export default function App() {
   const [modalUrl, setmodalUrl] = useState('');
 
   const onSubmit = query => {
-    images: [],
-      currentPage: 1;
-      searchQuery: query;
-      error: null;
+    images: [];
+    currentPage: 1;
+    searchQuery: query;
+    error: null;
     };
 
-  const fetchPictures = () => {
-    useCallback async () => {
-      setIsLoading(true);
-      try {
-        const { currentPage, searchQuery } = this.state;
-        const response = await fetch({
-          page: currentPage,
-          searchQuery: searchQuery,
-        });
+  function fetchPictures() {
+    function useEffect() {
+      async function setIsLoading() {
+        try {
+          const response = await fetch({
+            page: currentPage,
+            searchQuery: searchQuery,
+          });
 
-        this.setState(prevState => ({
-          images: [...prevState.images, ...response],
-          currentPage: prevState.currentPage + 1,
-        }));
-        toast.success('Loaded, here you go 🙂');
-      } catch (error) {
-        this.setState({ error });
-        toast.error('Sorry, something went wrong 😭');
-      } finally {
-        this.setState({ isLoading: false });
+          this.setState(prevState => ({
+            images: [...prevState.images, ...response],
+            currentPage: prevState.currentPage + 1,
+          }));
+          toast.success('Loaded, here you go 🙂');
+        } catch (error) {
+          this.setState({ error });
+          toast.error('Sorry, something went wrong 😭');
+        } finally {
+          this.setState({ isLoading: false });
+        }
       }
-    };
-  })
+    }
+  }
 
- useEffect(()=> {
+  function useEffect() {
     if (searchQuery) {
       fetchPictures();
    }
-    if (error) {
+    else (error) {
       console.log('Error');
     }
-  }, [searchQuery, currentPage, fetchPictures, error]);
+  }, [searchQuery, currentPage, fetchPictures, error];
 
   toggleModal((largeImageURL ) => {
     showModal: !showModal;
