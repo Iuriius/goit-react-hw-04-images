@@ -21,45 +21,41 @@ export default function App() {
     currentPage: 1;
     searchQuery: query;
     error: null;
-    };
+  };
 
-  function fetchPictures() {
-    function useEffect() {
-      async function setIsLoading() {
-        try {
-          const response = await fetch({
-            page: currentPage,
-            searchQuery: searchQuery,
-          });
-
-          this.setState(prevState => ({
-            images: [...prevState.images, ...response],
-            currentPage: prevState.currentPage + 1,
-          }));
-          toast.success('Loaded, here you go 🙂');
-        } catch (error) {
-          this.setState({ error });
-          toast.error('Sorry, something went wrong 😭');
-        } finally {
-          this.setState({ isLoading: false });
-        }
-      }
-    }
-  }
 
   function useEffect() {
     if (searchQuery) {
       fetchPictures();
-   }
-    else (error) {
-      console.log('Error');
     }
-  }, [searchQuery, currentPage, fetchPictures, error];
+    else { error }
+  }
+    
+  function fetchPictures() {
+    async function setIsLoading() {
+      try {
+        const response = await fetch({
+          page: currentPage,
+          searchQuery: searchQuery,
+        });
+        setImages(prevState => ({
+          images: [...prevState.images, ...response],
+          currentPage: prevState.currentPage + 1,
+        }));
+        toast.success('Loaded, here you go 🙂');
+      } catch (error) {
+        setError({ error });
+        toast.error('Sorry, something went wrong 😭');
+      } finally {
+        setisLoading({ isLoading: false });
+      }
+    }
+  }, [searchQuery, currentPage];
 
-  toggleModal((largeImageURL ) => {
+  function toggleModal(largeImageURL) {
     showModal: !showModal;
     modalUrl: largeImageURL;
-  });
+  };
   
   return (
     <>
