@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import fetch from '../components/Api';
 import Searchbar from '../components/Searchbar';
@@ -7,70 +7,78 @@ import Modal from '../components/Modal';
 import Button from '../components/Button';
 import Loader from '../components/Loader';
 
-export default function App() {
-  const [images, setImages] = useState([]);
-  const [currentPage, setcurrentPage] = useState(1);
-  const [searchQuery, setsearchQuery] = useState('');
-  const [isLoading, setisLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [showModal, setshowModal] = useState(false);
-  const [modalUrl, setmodalUrl] = useState('');
-
-  const onSubmit = query => {
-    images: [];
-    currentPage: 1;
-    searchQuery: query;
-    error: null;
+export class App extends Component {
+  state = {
+    images: [],
+    currentPage: 1,
+    searchQuery: '',
+    isLoading: false,
+    error: null,
+    showModal: false,
+    modalUrl: '',
   };
 
+  onSubmit = query => {
+    this.setState({
+      images: [],
+      currentPage: 1,
+      searchQuery: query,
+      error: null,
+    });
+  };
 
-  function useEffect() {
-    if (searchQuery) {
-      fetchPictures();
+  fetchPictures = async () => {
+    this.setState({ isLoading: true });
+    try {
+      const { currentPage, searchQuery } = this.state;
+      const response = await fetch({
+        page: currentPage,
+        searchQuery: searchQuery,
+      });
+
+      this.setState(prevState => ({
+        images: [...prevState.images, ...response],
+        currentPage: prevState.currentPage + 1,
+      }));
+      toast.success('Loaded, here you go 🙂');
+    } catch (error) {
+      this.setState({ error });
+      toast.error('Sorry, something went wrong 😭');
+    } finally {
+      this.setState({ isLoading: false });
     }
-    else { error }
+  };
+
+  componentDidUpdate(_, prevState) {
+    if (this.state.searchQuery !== prevState.searchQuery) {
+      this.fetchPictures();
+    }
   }
-    
-  function fetchPictures() {
-    async function setIsLoading() {
-      try {
-        const response = await fetch({
-          page: currentPage,
-          searchQuery: searchQuery,
-        });
-        setImages(prevState => ({
-          images: [...prevState.images, ...response],
-          currentPage: prevState.currentPage + 1,
-        }));
-        toast.success('Loaded, here you go 🙂');
-      } catch (error) {
-        setError({ error });
-        toast.error('Sorry, something went wrong 😭');
-      } finally {
-        setisLoading({ isLoading: false });
-      }
-    }
-  }, [searchQuery, currentPage];
 
-  function toggleModal(largeImageURL) {
-    showModal: !showModal;
-    modalUrl: largeImageURL;
+  toggleModal = largeImageURL => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+      modalUrl: largeImageURL,
+    }));
   };
-  
-  return (
-    <>
-      <Toaster />
-      <div className="App">
-        <Searchbar onSubmit={onSubmit} />
-        <div>
-          <ImageGallery images={images} onClick={toggleModal} />
+
+  render() {
+    const { images, isLoading, showModal, modalUrl } = this.state;
+    return (
+      <>
+        <Toaster />
+        <div className="App">
+          <Searchbar onSubmit={this.onSubmit} />
+          <div>
+            <ImageGallery images={images} onClick={this.toggleModal} />
+          </div>
+          {images.length % 12 < 1 && images.length > 0 && (
+            <Button onClick={this.fetchPictures} btn={this.btn} />
+          )}
+          <Loader loading={isLoading} />
+          {showModal && <Modal url={modalUrl} toggleModal={this.toggleModal} />}
         </div>
-        {images.length % 12 < 1 && images.length > 0 && (
-          <Button onClick={fetchPictures} btn={btn} />
-        )}
-        <Loader loading={isLoading} />
-        {showModal && <Modal url={modalUrl} toggleModal={toggleModal} />}
-      </div>
-    </>
-  );
+      </>
+    );
+  }
 }

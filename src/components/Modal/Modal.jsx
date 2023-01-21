@@ -1,37 +1,45 @@
-import React, { useEffect } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { createPortal } from 'react-dom';
 
 const modalRoot = document.querySelector('#modal-root');
 
-export default function Modal() {
-  useEffect(() => {
-    const keydown = event => {
-      if (event.code === 'Escape') {
-        this.props.toggleModal();
-      }
-    };
+class Modal extends Component {
+  componentDidMount() {
     window.addEventListener('keydown', this.keydown);
-  });
+  }
 
-  const clickOut = event => {
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.keydown);
+  }
+
+  keydown = event => {
+    if (event.code === 'Escape') {
+      this.props.toggleModal();
+    }
+  };
+
+  clickOut = event => {
     if (event.target === event.currentTarget) {
       this.props.toggleModal();
     }
-    window.removeEventListener('keydown', this.keydown);
   };
 
-  return createPortal(
-    <div className="Overlay" onClick={clickOut}>
-      <div className="Modal">
-        <img src={this.props.url} alt="this is a large img" />
-      </div>
-    </div>,
-    modalRoot
-  );
+  render() {
+    return createPortal(
+      <div className="Overlay" onClick={this.clickOut}>
+        <div className="Modal">
+          <img src={this.props.url} alt="this is a large img" />
+        </div>
+      </div>,
+      modalRoot
+    );
+  }
 }
 
 Modal.propTypes = {
   toggleModal: PropTypes.func,
   url: PropTypes.string,
 };
+
+export default Modal;
