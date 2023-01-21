@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import fetch from '../components/Api';
 import Searchbar from '../components/Searchbar';
@@ -7,27 +7,23 @@ import Modal from '../components/Modal';
 import Button from '../components/Button';
 import Loader from '../components/Loader';
 
-export class App extends Component {
-  state = {
-    images: [],
-    currentPage: 1,
-    searchQuery: '',
-    isLoading: false,
-    error: null,
-    showModal: false,
-    modalUrl: '',
+export default function App {
+  const [images, setImages] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalUrl, setModalUrl] = useState('');
+
+  const onSubmit = query => {
+    setImages([]);
+    setCurrentPage(1);
+    setSearchQuery(query);
+    setError(null);
   };
 
-  onSubmit = query => {
-    this.setState({
-      images: [],
-      currentPage: 1,
-      searchQuery: query,
-      error: null,
-    });
-  };
-
-  fetchPictures = async () => {
+  const fetchPictures = async () => {
     this.setState({ isLoading: true });
     try {
       const { currentPage, searchQuery } = this.state;
@@ -49,36 +45,33 @@ export class App extends Component {
     }
   };
 
-  componentDidUpdate(_, prevState) {
+  const componentDidUpdate(_, prevState) {
     if (this.state.searchQuery !== prevState.searchQuery) {
       this.fetchPictures();
     }
   }
 
-  toggleModal = largeImageURL => {
+  const toggleModal = largeImageURL => {
     this.setState(({ showModal }) => ({
       showModal: !showModal,
       modalUrl: largeImageURL,
     }));
   };
 
-  render() {
-    const { images, isLoading, showModal, modalUrl } = this.state;
     return (
       <>
         <Toaster />
         <div className="App">
-          <Searchbar onSubmit={this.onSubmit} />
+          <Searchbar onSubmit={onSubmit} />
           <div>
-            <ImageGallery images={images} onClick={this.toggleModal} />
+            <ImageGallery images={images} onClick={toggleModal} />
           </div>
           {images.length % 12 < 1 && images.length > 0 && (
-            <Button onClick={this.fetchPictures} btn={this.btn} />
+            <Button onClick={this.fetchPictures} btn={btn} />
           )}
           <Loader loading={isLoading} />
-          {showModal && <Modal url={modalUrl} toggleModal={this.toggleModal} />}
+          {showModal && <Modal url={modalUrl} toggleModal={toggleModal} />}
         </div>
       </>
     );
   }
-}
