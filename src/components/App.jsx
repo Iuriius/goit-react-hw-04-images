@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import fetch from '../components/Api';
 import Searchbar from '../components/Searchbar';
@@ -7,7 +7,7 @@ import Modal from '../components/Modal';
 import Button from '../components/Button';
 import Loader from '../components/Loader';
 
-export default function App {
+export default function App() {
   const [images, setImages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,39 +24,33 @@ export default function App {
   };
 
   const fetchPictures = async () => {
-    this.setState({ isLoading: true });
+    setIsLoading({ isLoading: true });
     try {
-      const { currentPage, searchQuery } = this.state;
       const response = await fetch({
         page: currentPage,
         searchQuery: searchQuery,
       });
-
-      this.setState(prevState => ({
+      setCurrentPage(prevState => ({
         images: [...prevState.images, ...response],
         currentPage: prevState.currentPage + 1,
       }));
       toast.success('Loaded, here you go 🙂');
     } catch (error) {
-      this.setState({ error });
+      setError(error);
       toast.error('Sorry, something went wrong 😭');
     } finally {
-      this.setState({ isLoading: false });
+      setShowModal({ isLoading: false });
     }
-  };
 
-  const componentDidUpdate(_, prevState) {
-    if (this.state.searchQuery !== prevState.searchQuery) {
-      this.fetchPictures();
-    }
-  }
+    const toggleModal = largeImageURL => {
+      setShowModal(({ showModal }) => ({
+        showModal: !showModal,
+        modalUrl: largeImageURL,
+      }));
+    };
 
-  const toggleModal = largeImageURL => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-      modalUrl: largeImageURL,
-    }));
-  };
+    
+    useEffect(searchQuery) => {}, [fetchPictures];
 
     return (
       <>
@@ -67,11 +61,12 @@ export default function App {
             <ImageGallery images={images} onClick={toggleModal} />
           </div>
           {images.length % 12 < 1 && images.length > 0 && (
-            <Button onClick={this.fetchPictures} btn={btn} />
+            <Button onClick={fetchPictures} btn={Button} />
           )}
           <Loader loading={isLoading} />
           {showModal && <Modal url={modalUrl} toggleModal={toggleModal} />}
         </div>
       </>
     );
-  }
+  };
+}
