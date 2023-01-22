@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import fetch from '../components/Api';
 import Searchbar from '../components/Searchbar';
@@ -23,7 +23,7 @@ export default function App() {
     setError(null);
   };
 
-  const fetchPictures = async () => {
+  const fetchPictures = useCallback(async () => {
     setIsLoading({ isLoading: true });
     try {
       const response = await fetch({
@@ -35,38 +35,36 @@ export default function App() {
         currentPage: prevState.currentPage + 1,
       }));
       toast.success('Loaded, here you go 🙂');
-    } catch (error) {
+    } catch {
       setError(error);
       toast.error('Sorry, something went wrong 😭');
     } finally {
       setShowModal({ isLoading: false });
     }
+  }, [searchQuery, currentPage, error]);
 
-    const toggleModal = largeImageURL => {
-      setShowModal(({ showModal }) => ({
-        showModal: !showModal,
-        modalUrl: largeImageURL,
-      }));
-    };
-
-    
-    useEffect(searchQuery) => {}, [fetchPictures];
-
-    return (
-      <>
-        <Toaster />
-        <div className="App">
-          <Searchbar onSubmit={onSubmit} />
-          <div>
-            <ImageGallery images={images} onClick={toggleModal} />
-          </div>
-          {images.length % 12 < 1 && images.length > 0 && (
-            <Button onClick={fetchPictures} btn={Button} />
-          )}
-          <Loader loading={isLoading} />
-          {showModal && <Modal url={modalUrl} toggleModal={toggleModal} />}
-        </div>
-      </>
-    );
+  const toggleModal = largeImageURL => {
+    setShowModal(({ showModal }) => ({
+      showModal: !showModal,
+      modalUrl: largeImageURL,
+    }));
+    setModalUrl();
   };
+
+  return (
+    <>
+      <Toaster />
+      <div className="App">
+        <Searchbar onSubmit={onSubmit} />
+        <div>
+          <ImageGallery images={images} onClick={toggleModal} />
+        </div>
+        {images.length % 12 < 1 && images.length > 0 && (
+          <Button onClick={fetchPictures} btn={Button} />
+        )}
+        <Loader loading={isLoading} />
+        {showModal && <Modal url={modalUrl} toggleModal={toggleModal} />}
+      </div>
+    </>
+  );
 }
