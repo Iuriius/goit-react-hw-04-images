@@ -23,6 +23,10 @@ export default function App() {
     setError(null);
   };
 
+  const fetchPictures = () => {
+    onSubmit();
+  };
+
   useEffect(() => {
     async function foo() {
       setIsLoading({ isLoading: true });
@@ -31,19 +35,20 @@ export default function App() {
           page: currentPage,
           searchQuery: searchQuery,
         });
+        // console.log(response);
         setImages(prevState => [...prevState, ...response.hits]);
         toast.success('Loaded, here you go 🙂');
       } catch {
-        setError(error);
+        setError(error => error);
         toast.error('Sorry, something went wrong 😭');
       } finally {
-        setShowModal({ isLoading: false });
+        setIsLoading({ isLoading: false });
       }
     }
     foo();
   }, [searchQuery, currentPage]);
 
-  const toggleModal = () => {
+  const toggleModal = modalUrl => {
     setShowModal(!showModal);
     setModalUrl(modalUrl);
   };
