@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import fetch from '../components/Api';
+import getfetch from '../components/Api';
 import Searchbar from '../components/Searchbar';
 import ImageGallery from '../components/ImageGallery';
 import Modal from '../components/Modal';
@@ -24,17 +24,14 @@ export default function App() {
   };
 
   useEffect(() => {
-    function foo() {
+    async function foo() {
       setIsLoading({ isLoading: true });
       try {
-        const response = fetch({
+        const response = await getfetch({
           page: currentPage,
           searchQuery: searchQuery,
         });
-        setCurrentPage(prevState => ({
-          images: [...prevState.images, ...response],
-          currentPage: prevState.currentPage + 1,
-        }));
+        setImages(prevState => [...prevState, ...response.hits]);
         toast.success('Loaded, here you go 🙂');
       } catch {
         setError(error);
@@ -44,7 +41,7 @@ export default function App() {
       }
     }
     foo();
-  }, [searchQuery, currentPage, error]);
+  }, [searchQuery, currentPage]);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -62,6 +59,7 @@ export default function App() {
         {images.length % 12 < 1 && images.length > 0 && (
           <Button onClick={fetchPictures} btn={Button} />
         )}
+        {error && <p> {error} </p>}
         <Loader loading={isLoading} />
         {showModal && <Modal url={modalUrl} toggleModal={toggleModal} />}
       </div>

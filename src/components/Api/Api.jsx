@@ -4,7 +4,7 @@ const axiosApi = axios.create({
   baseURL: 'https://pixabay.com/api',
 });
 
-const fetch = async ({ page = 1, searchQuery = '' }) => {
+const getfetch = async ({ page = 1, searchQuery = '' }) => {
   const response = await axiosApi.get('/', {
     params: {
       q: searchQuery,
@@ -15,7 +15,7 @@ const fetch = async ({ page = 1, searchQuery = '' }) => {
       per_page: 12,
     },
   });
-  return response.data.hits;
+  return response.data;
 };
 
-export default fetch;
+export default getfetch;
