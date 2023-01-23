@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import fetch from '../components/Api';
 import Searchbar from '../components/Searchbar';
@@ -23,32 +23,32 @@ export default function App() {
     setError(null);
   };
 
-  const fetchPictures = useCallback(async () => {
-    setIsLoading({ isLoading: true });
-    try {
-      const response = await fetch({
-        page: currentPage,
-        searchQuery: searchQuery,
-      });
-      setCurrentPage(prevState => ({
-        images: [...prevState.images, ...response],
-        currentPage: prevState.currentPage + 1,
-      }));
-      toast.success('Loaded, here you go 🙂');
-    } catch {
-      setError(error);
-      toast.error('Sorry, something went wrong 😭');
-    } finally {
-      setShowModal({ isLoading: false });
+  useEffect(() => {
+    function foo() {
+      setIsLoading({ isLoading: true });
+      try {
+        const response = fetch({
+          page: currentPage,
+          searchQuery: searchQuery,
+        });
+        setCurrentPage(prevState => ({
+          images: [...prevState.images, ...response],
+          currentPage: prevState.currentPage + 1,
+        }));
+        toast.success('Loaded, here you go 🙂');
+      } catch {
+        setError(error);
+        toast.error('Sorry, something went wrong 😭');
+      } finally {
+        setShowModal({ isLoading: false });
+      }
     }
+    foo();
   }, [searchQuery, currentPage, error]);
 
-  const toggleModal = largeImageURL => {
-    setShowModal(({ showModal }) => ({
-      showModal: !showModal,
-      modalUrl: largeImageURL,
-    }));
-    setModalUrl();
+  const toggleModal = () => {
+    setShowModal(!showModal);
+    setModalUrl(modalUrl);
   };
 
   return (
