@@ -5,13 +5,13 @@ import Searchbar from '../components/Searchbar';
 import ImageGallery from '../components/ImageGallery';
 import Modal from '../components/Modal';
 import Button from '../components/Button';
-import Loader from '../components/Loader';
+// import Loader from '../components/Loader';
 
 export default function App() {
   const [images, setImages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
@@ -23,34 +23,39 @@ export default function App() {
     setError(null);
   };
 
-  const fetchPictures = () => {
-    onSubmit();
-  };
-
   useEffect(() => {
-    async function foo() {
-      setIsLoading({ isLoading: true });
-      try {
-        const response = await getfetch({
-          page: currentPage,
-          searchQuery: searchQuery,
-        });
-        // console.log(response);
-        setImages(prevState => [...prevState, ...response.hits]);
-        toast.success('Loaded, here you go 🙂');
-      } catch {
-        setError(error => error);
-        toast.error('Sorry, something went wrong 😭');
-      } finally {
-        setIsLoading({ isLoading: false });
+    if (!searchQuery) {
+      return;
+    } else {
+      async function foo() {
+        // setLoading({ loading: true });
+        try {
+          const response = await getfetch({
+            page: currentPage,
+            searchQuery: searchQuery,
+          });
+          setImages(prevState => [...prevState, ...response.hits]);
+          toast.success('Loaded, here you go 🙂');
+          // console.log(setCurrentPage());
+        } catch {
+          setError(error => error);
+          toast.error('Sorry, something went wrong 😭');
+          // setLoading({ loading: false });
+        } finally {
+          // setLoading({ loading: false });
+        }
       }
+      foo();
     }
-    foo();
   }, [searchQuery, currentPage]);
 
   const toggleModal = modalUrl => {
     setShowModal(!showModal);
     setModalUrl(modalUrl);
+  };
+
+  const more = currentPage => {
+    return setCurrentPage((currentPage += 1));
   };
 
   return (
@@ -62,10 +67,10 @@ export default function App() {
           <ImageGallery images={images} onClick={toggleModal} />
         </div>
         {images.length % 12 < 1 && images.length > 0 && (
-          <Button onClick={fetchPictures} btn={Button} />
+          <Button onClick={more} btn={Button} />
         )}
+        {/* <Loader loading={loading} /> */}
         {error && <p> {error} </p>}
-        <Loader loading={isLoading} />
         {showModal && <Modal url={modalUrl} toggleModal={toggleModal} />}
       </div>
     </>
