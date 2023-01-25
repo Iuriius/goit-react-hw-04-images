@@ -5,13 +5,13 @@ import Searchbar from '../components/Searchbar';
 import ImageGallery from '../components/ImageGallery';
 import Modal from '../components/Modal';
 import Button from '../components/Button';
-// import Loader from '../components/Loader';
+import Loader from '../components/Loader';
 
 export default function App() {
   const [images, setImages] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
@@ -21,6 +21,7 @@ export default function App() {
     setCurrentPage(1);
     setSearchQuery(query);
     setError(null);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function App() {
       return;
     } else {
       async function foo() {
-        // setLoading({ loading: true });
+        setLoading({ loading: true });
         try {
           const response = await getfetch({
             page: currentPage,
@@ -40,9 +41,9 @@ export default function App() {
         } catch {
           setError(error => error);
           toast.error('Sorry, something went wrong 😭');
-          // setLoading({ loading: false });
+          setLoading({ loading: false });
         } finally {
-          // setLoading({ loading: false });
+          setLoading({ loading: false });
         }
       }
       foo();
@@ -69,7 +70,7 @@ export default function App() {
         {images.length % 12 < 1 && images.length > 0 && (
           <Button onClick={more} btn={Button} />
         )}
-        {/* <Loader loading={loading} /> */}
+        <Loader loading={loading} />
         {error && <p> {error} </p>}
         {showModal && <Modal url={modalUrl} toggleModal={toggleModal} />}
       </div>
