@@ -54,8 +54,8 @@ export default function App() {
     setModalUrl(modalUrl);
   };
 
-  const more = currentPage => {
-    return setCurrentPage((currentPage += 1));
+  const more = () => {
+    setCurrentPage(prev => prev + 1);
   };
 
   return (
