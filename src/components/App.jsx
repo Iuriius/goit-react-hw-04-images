@@ -21,7 +21,6 @@ export default function App() {
     setCurrentPage(1);
     setSearchQuery(query);
     setError(null);
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export default function App() {
       return;
     } else {
       async function foo() {
-        setLoading({ loading: true });
+        setLoading(true);
         try {
           const response = await getfetch({
             page: currentPage,
@@ -37,13 +36,11 @@ export default function App() {
           });
           setImages(prevState => [...prevState, ...response.hits]);
           toast.success('Loaded, here you go 🙂');
-          // console.log(setCurrentPage());
         } catch {
           setError(error => error);
           toast.error('Sorry, something went wrong 😭');
-          setLoading({ loading: false });
         } finally {
-          setLoading({ loading: false });
+          setLoading(false);
         }
       }
       foo();
